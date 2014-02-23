@@ -122,7 +122,7 @@ static const int COST_TO_CHOOSE = 1;
     {
         [self.matchingQueue removeAllObjects];
         self.cardsCurrentlyActive=0;
-        actionDescription = [NSString stringWithFormat:@"Matched %@ for %li poitns", actionDescription, self.score-startingScore];
+        actionDescription = [NSString stringWithFormat:@"Matched %@ for %li points", actionDescription, self.score-startingScore];
         
     }
     self.lastAction = actionDescription;
