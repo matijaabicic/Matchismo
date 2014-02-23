@@ -53,7 +53,6 @@
     //now choose the card and update UI
     NSUInteger cardIndex = [self.cardButtons indexOfObject:sender];
     [self.game chooseCardAtIndex:cardIndex];
-    self.LastAction.text = [self.game getLastAction];
     [self updateUI];
 }
 
@@ -85,14 +84,71 @@
     {
         NSUInteger cardIndex = [self.cardButtons indexOfObject:cardButton];
         Card *card = [self.game cardAtIndex:cardIndex];
-        [cardButton setTitle:[self titleForCard:card]forState:UIControlStateNormal];
+        //[cardButton setTitle:[self titleForCard:card]forState:UIControlStateNormal];
+        //set attributed title instead of default black one
+        [cardButton setAttributedTitle:[self attributedTitleForCard:card] forState:UIControlStateNormal];
         [cardButton setBackgroundImage:[self backgroundImageForCard:card] forState:UIControlStateNormal];
         cardButton.enabled = !card.matched;
     }
+    //make last action attributed
+    //self.LastAction.text = [self.game getLastAction];
+    self.LastAction.attributedText = [self attributedLastAction];
+    
     self.scoreLabel.text = [NSString stringWithFormat:@"Score: %d", (int)self.game.score];
 }
 -(NSString *)titleForCard:(Card *)card{
     return card.isChosen ? card.contents : @"";
+}
+-(NSMutableAttributedString *)attributedLastAction
+{
+    //@"♣︎", @"♥︎", @"♦︎", @"♠︎"
+    NSString *lastActionString = [self.game getLastAction];
+    NSMutableAttributedString *result = [[NSMutableAttributedString alloc] initWithString:lastActionString];
+    //there must be a better way of doing this, but...here goes the sloppy way
+    //first find and color the hearts
+    NSRange range = [lastActionString rangeOfString:@"♥︎"];
+    while (range.location != NSNotFound) {
+        [result setAttributes:@{NSForegroundColorAttributeName:[UIColor redColor]}range:range];
+        range =[lastActionString  rangeOfString:@"♥︎" options:NSCaseInsensitiveSearch range:NSMakeRange(range.location + 1, [lastActionString length] - range.location - 1)];
+        
+    }
+    //then find and color the diamonds
+    range = [lastActionString rangeOfString:@"♦︎"];
+    while (range.location != NSNotFound) {
+        [result setAttributes:@{NSForegroundColorAttributeName:[UIColor redColor]}range:range];
+        range =[lastActionString rangeOfString:@"♦︎" options:NSCaseInsensitiveSearch range:NSMakeRange(range.location + 1, [lastActionString length] - range.location - 1)];
+    }
+    
+    return result;
+}
+-(NSMutableAttributedString *)attributedTitleForCard:(Card *)card
+{
+    //don't worry about non-chosen cards
+    if (!card.isChosen){
+        return [[NSMutableAttributedString  alloc] initWithString:@""];
+    }
+    //first, get the mutable attributed string from the concents of the card by calling the old titleForCard
+    UIColor *fontColor = [[UIColor alloc] init];
+    //first check if it's one of the black suits
+    if ([card.contents rangeOfString:@"♣︎"].location != NSNotFound || [card.contents rangeOfString:@"♠︎"].location != NSNotFound)
+    {
+        fontColor = [UIColor blackColor];
+    }
+    //if not, it must be a red suit
+    else
+    {
+        fontColor = [UIColor redColor];
+    }
+
+    //first set the whole string in suit color
+    NSMutableAttributedString *result = [[NSMutableAttributedString alloc] initWithString:[self titleForCard:card] attributes:@{NSForegroundColorAttributeName:fontColor}];
+
+    //the edit the rank portion and set it black
+    [result setAttributes:@{NSForegroundColorAttributeName:[UIColor blackColor]} range:NSMakeRange(0,result.string.length-2)];
+    
+    
+    
+    return result;
 }
 
 -(UIImage *)backgroundImageForCard:(Card *)card{
