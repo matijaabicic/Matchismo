@@ -90,11 +90,36 @@
         [cardButton setBackgroundImage:[self backgroundImageForCard:card] forState:UIControlStateNormal];
         cardButton.enabled = !card.matched;
     }
-    self.LastAction.text = [self.game getLastAction];
+    //make last action attributed
+    //self.LastAction.text = [self.game getLastAction];
+    self.LastAction.attributedText = [self attributedLastAction];
+    
     self.scoreLabel.text = [NSString stringWithFormat:@"Score: %d", (int)self.game.score];
 }
 -(NSString *)titleForCard:(Card *)card{
     return card.isChosen ? card.contents : @"";
+}
+-(NSMutableAttributedString *)attributedLastAction
+{
+    //@"♣︎", @"♥︎", @"♦︎", @"♠︎"
+    NSString *lastActionString = [self.game getLastAction];
+    NSMutableAttributedString *result = [[NSMutableAttributedString alloc] initWithString:lastActionString];
+    //there must be a better way of doing this, but...here goes the sloppy way
+    //first find and color the hearts
+    NSRange range = [lastActionString rangeOfString:@"♥︎"];
+    while (range.location != NSNotFound) {
+        [result setAttributes:@{NSForegroundColorAttributeName:[UIColor redColor]}range:range];
+        range =[lastActionString  rangeOfString:@"♥︎" options:NSCaseInsensitiveSearch range:NSMakeRange(range.location + 1, [lastActionString length] - range.location - 1)];
+        
+    }
+    //then find and color the diamonds
+    range = [lastActionString rangeOfString:@"♦︎"];
+    while (range.location != NSNotFound) {
+        [result setAttributes:@{NSForegroundColorAttributeName:[UIColor redColor]}range:range];
+        range =[lastActionString rangeOfString:@"♦︎" options:NSCaseInsensitiveSearch range:NSMakeRange(range.location + 1, [lastActionString length] - range.location - 1)];
+    }
+    
+    return result;
 }
 -(NSMutableAttributedString *)attributedTitleForCard:(Card *)card
 {
