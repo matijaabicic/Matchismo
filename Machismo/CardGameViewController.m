@@ -53,7 +53,6 @@
     //now choose the card and update UI
     NSUInteger cardIndex = [self.cardButtons indexOfObject:sender];
     [self.game chooseCardAtIndex:cardIndex];
-    self.LastAction.text = [self.game getLastAction];
     [self updateUI];
 }
 
@@ -86,11 +85,12 @@
         NSUInteger cardIndex = [self.cardButtons indexOfObject:cardButton];
         Card *card = [self.game cardAtIndex:cardIndex];
         //[cardButton setTitle:[self titleForCard:card]forState:UIControlStateNormal];
-        //set attributed title instead of default black one 
+        //set attributed title instead of default black one
         [cardButton setAttributedTitle:[self attributedTitleForCard:card] forState:UIControlStateNormal];
         [cardButton setBackgroundImage:[self backgroundImageForCard:card] forState:UIControlStateNormal];
         cardButton.enabled = !card.matched;
     }
+    self.LastAction.text = [self.game getLastAction];
     self.scoreLabel.text = [NSString stringWithFormat:@"Score: %d", (int)self.game.score];
 }
 -(NSString *)titleForCard:(Card *)card{
