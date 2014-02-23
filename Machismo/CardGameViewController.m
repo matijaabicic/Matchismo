@@ -85,7 +85,9 @@
     {
         NSUInteger cardIndex = [self.cardButtons indexOfObject:cardButton];
         Card *card = [self.game cardAtIndex:cardIndex];
-        [cardButton setTitle:[self titleForCard:card]forState:UIControlStateNormal];
+        //[cardButton setTitle:[self titleForCard:card]forState:UIControlStateNormal];
+        //set attributed title instead of default black one
+        [cardButton setAttributedTitle:[self attributedTitleForCard:card] forState:UIControlStateNormal];
         [cardButton setBackgroundImage:[self backgroundImageForCard:card] forState:UIControlStateNormal];
         cardButton.enabled = !card.matched;
     }
@@ -93,6 +95,35 @@
 }
 -(NSString *)titleForCard:(Card *)card{
     return card.isChosen ? card.contents : @"";
+}
+-(NSMutableAttributedString *)attributedTitleForCard:(Card *)card
+{
+    //don't worry about non-chosen cards
+    if (!card.isChosen){
+        return [[NSMutableAttributedString  alloc] initWithString:@""];
+    }
+    //first, get the mutable attributed string from the concents of the card by calling the old titleForCard
+    UIColor *fontColor = [[UIColor alloc] init];
+    //first check if it's one of the black suits
+    if ([card.contents rangeOfString:@"♣︎"].location != NSNotFound || [card.contents rangeOfString:@"♠︎"].location != NSNotFound)
+    {
+        fontColor = [UIColor blackColor];
+    }
+    //if not, it must be a red suit
+    else
+    {
+        fontColor = [UIColor redColor];
+    }
+
+    //first set the whole string in suit color
+    NSMutableAttributedString *result = [[NSMutableAttributedString alloc] initWithString:[self titleForCard:card] attributes:@{NSForegroundColorAttributeName:fontColor}];
+
+    //the edit the rank portion and set it black
+    [result setAttributes:@{NSForegroundColorAttributeName:[UIColor blackColor]} range:NSMakeRange(0,result.string.length-2)];
+    
+    
+    
+    return result;
 }
 
 -(UIImage *)backgroundImageForCard:(Card *)card{
