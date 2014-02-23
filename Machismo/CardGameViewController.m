@@ -86,7 +86,7 @@
         NSUInteger cardIndex = [self.cardButtons indexOfObject:cardButton];
         Card *card = [self.game cardAtIndex:cardIndex];
         //[cardButton setTitle:[self titleForCard:card]forState:UIControlStateNormal];
-        //set attributed title instead of default black one
+        //set attributed title instead of default black one 
         [cardButton setAttributedTitle:[self attributedTitleForCard:card] forState:UIControlStateNormal];
         [cardButton setBackgroundImage:[self backgroundImageForCard:card] forState:UIControlStateNormal];
         cardButton.enabled = !card.matched;
