@@ -46,6 +46,7 @@ static const int COST_TO_CHOOSE = 1;
 {
     self = [self initWithCardCount:count usingDeck:deck];
     self.cardsToMatch = target;
+    self.lastAction = @"";
     return self;
 }
 -(instancetype)initWithCardCount:(NSUInteger)count usingDeck:(Deck *)deck{
